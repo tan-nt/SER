@@ -22,3 +22,4 @@ pydub
 sounddevice
 streamlit-audiorecorder
 audiorecorder
+google-cloud-aiplatform
