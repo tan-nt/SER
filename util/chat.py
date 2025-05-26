@@ -4,6 +4,11 @@ import vertexai.preview.generative_models as generative_models
 import re
 from vertexai.generative_models import GenerativeModel, Part, SafetySetting, FinishReason, Tool
 from util.config import cf
+from google import genai
+from google.genai import types
+import base64
+
+from util.config import cf
 
 generation_config = {
     "max_output_tokens": 8192,
@@ -32,33 +37,55 @@ safety_settings = [
 
 
 def google_gemini_generate_answer(question=''):
-    try:
-        if not question:
-            return
+    question = f"""
+        {question}
 
-        vertexai.init(project=cf.get("PROJECT_ID"), location="us-central1")
-        model = GenerativeModel(
-            "gemini-1.5-flash-001",
-        )
-        responses = model.generate_content(
-            [question],
-            generation_config=generation_config,
-            safety_settings=safety_settings,
-            stream=True,
-        )
+        IMPORTANT: Please provide the answer in plain text format, without any Markdown, formatting symbols (like **, _, `), emojis, or extra whitespace.
+        """
+    client = genai.Client(
+        vertexai=True,
+        project=cf.get("PROJECT_ID"),
+        location="global",
+    )
 
-        result = ""
-        for response in responses:
-            if response:
-                result += response.text
+    model = "gemini-2.5-pro-preview-05-06"
+    contents = [
+        types.Content(
+        role="user",
+        parts=[
+            types.Part.from_text(text=question)
+        ]
+        ),
+    ]
 
-        print('result', result)
+    generate_content_config = types.GenerateContentConfig(
+        temperature = 1,
+        top_p = 1,
+        seed = 0,
+        max_output_tokens = 65535,
+        safety_settings = [types.SafetySetting(
+        category="HARM_CATEGORY_HATE_SPEECH",
+        threshold="OFF"
+        ),types.SafetySetting(
+        category="HARM_CATEGORY_DANGEROUS_CONTENT",
+        threshold="OFF"
+        ),types.SafetySetting(
+        category="HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        threshold="OFF"
+        ),types.SafetySetting(
+        category="HARM_CATEGORY_HARASSMENT",
+        threshold="OFF"
+        )],
+    )
 
-        return re.sub("\s\s+", " ", result.strip())
-    except Exception as e:
-        # logger.info(
-        #     "failed to get google_gemini_generate_answer, question=%s err=%s", question, e)
-        return ""
+    result = ""
+    for chunk in client.models.generate_content_stream(
+        model = model,
+        contents = contents,
+        config = generate_content_config,
+        ):
+        result += chunk.text
+    return re.sub("\s\s+", " ", result.strip())
 
 
 def google_gemini_generate_answer_with_grounding(question=''):

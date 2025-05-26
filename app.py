@@ -32,10 +32,8 @@ if st.button("Speak"):
 
 # Display the conversation
 # breakpoint()
-for speaker, message in st.session_state.conversation:
+for i, (speaker, message) in enumerate(st.session_state.conversation):
     if speaker == "user":
-        #st.markdown(f"<div style='text-align: left; color: blue;'>{message}</div>", unsafe_allow_html=True)
-        st.button(message)
+        st.button(message, key=f"user_{i}")
     else:
-        #st.markdown(f"<div style='text-align: right; color: green;'>{message}</div>", unsafe_allow_html=True)
-        st.button(message)
+        st.button(message, key=f"bot_{i}")

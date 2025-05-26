@@ -1,5 +1,2 @@
 ENV: dev
-PRODUCT_ID: anfin-dev
-GCP_PROJECT_ID: anfin-dev
-
-BUCKET: anfin-dev.appspot.com
+PRODUCT_ID: intelligent-tutoring

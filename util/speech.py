@@ -4,10 +4,6 @@ import speech_recognition as sr
 import pyttsx3
 import threading
 
-
-engine = pyttsx3.init()
-
-
 def transcribe_audio(filename):
     """
     Transcribes the given audio file using Google's speech recognition.
@@ -29,12 +25,14 @@ def transcribe_audio(filename):
         print(f"Could not request results from Google Speech Recognition service; {e}")
         return None
 
+import pyttsx3
+from multiprocessing import Process
+
+def _speak(text):
+    engine = pyttsx3.init()
+    engine.say(text)
+    engine.runAndWait()
 
 def speak_text(text):
-    def _speak():
-        engine = pyttsx3.init()
-        engine.say(text)
-        engine.runAndWait()
-
-    t = threading.Thread(target=_speak)
-    t.start()
+    p = Process(target=_speak, args=(text,))
+    p.start()
