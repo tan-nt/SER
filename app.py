@@ -4,12 +4,14 @@ from util.chat import google_gemini_generate_answer
 from util.speech import transcribe_audio, speak_text
 
 
+import sounddevice as sd
+print(sd.query_devices())
+
 st.title("Speech Recognition Project")
 
 if 'conversation' not in st.session_state:
     st.session_state.conversation = []
 
-device_id = 0  # Replace with the appropriate device ID from your list
 
 if st.button("Speak"):
     # Record audio from the microphone
@@ -30,8 +32,8 @@ if st.button("Speak"):
         # Speak out the response
         speak_text(response_from_gpt)
 
-# Display the conversation
-# breakpoint()
+
+
 for i, (speaker, message) in enumerate(st.session_state.conversation):
     if speaker == "user":
         st.button(message, key=f"user_{i}")

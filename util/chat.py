@@ -45,9 +45,7 @@ def google_gemini_generate_answer(question=''):
         IMPORTANT: Please provide the answer in plain text format, without any Markdown, formatting symbols (like **, _, `), emojis, or extra whitespace.
         """
 
-    # 🔥 Load credentials from Streamlit secrets
-    service_account_info = st.secrets["service_account"]
-    credentials = service_account.Credentials.from_service_account_info(service_account_info)
+
 
     client = genai.Client(
         vertexai=True,
@@ -56,6 +54,9 @@ def google_gemini_generate_answer(question=''):
     )
 
     if cf.get("ENV") != "dev":
+         # 🔥 Load credentials from Streamlit secrets
+        service_account_info = st.secrets["service_account"]
+        credentials = service_account.Credentials.from_service_account_info(service_account_info)
         client = genai.Client(
             vertexai=True,
             project=cf.get("PROJECT_ID"),

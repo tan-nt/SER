@@ -15,7 +15,7 @@ def record_audio(record_seconds=5, rate=44100, device=0):
         filename = temp_audio_file.name
         if cf.get("ENV") == "dev":
             # For local macos
-            device = 1
+            device = 0
         myrecording = sd.rec(int(record_seconds * rate), samplerate=rate, channels=1, device=device)
         sd.wait()  # Wait until recording is finished
         print("Finished recording.")
