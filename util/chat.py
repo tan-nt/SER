@@ -7,6 +7,8 @@ from util.config import cf
 from google import genai
 from google.genai import types
 import base64
+import streamlit as st
+from google.oauth2 import service_account
 
 from util.config import cf
 
@@ -42,11 +44,24 @@ def google_gemini_generate_answer(question=''):
 
         IMPORTANT: Please provide the answer in plain text format, without any Markdown, formatting symbols (like **, _, `), emojis, or extra whitespace.
         """
+
+    # 🔥 Load credentials from Streamlit secrets
+    service_account_info = st.secrets["service_account"]
+    credentials = service_account.Credentials.from_service_account_info(service_account_info)
+
     client = genai.Client(
         vertexai=True,
         project=cf.get("PROJECT_ID"),
         location="global",
     )
+
+    if cf.get("ENV") != "dev":
+        client = genai.Client(
+            vertexai=True,
+            project=cf.get("PROJECT_ID"),
+            location="global",
+            credentials=credentials,
+        )
 
     model = "gemini-2.5-pro-preview-05-06"
     contents = [
